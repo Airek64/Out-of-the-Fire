@@ -29,6 +29,7 @@ window.onload = function() {
         game.load.audio('open', 'assets/door_open.ogg');
     }
     
+    //global variables
     var fireball;
     var player;
     var background;
@@ -49,32 +50,38 @@ window.onload = function() {
     var doorSound;
     
     function create() {
+        
+        //initialize health
         health = 3;
         
+        //initialize sound
         hurtSound = game.add.audio('hurt');
         jumpSound = game.add.audio('jump');
         lightSound = game.add.audio('light');
         doorSound = game.add.audio('open');
         
+        //initialize background (and wall)
         background = game.add.tileSprite(0, 0, 800, 600, 'bg');
         background.fixedToCamera = true;
         wall = game.add.tileSprite(0, 400, 800, 200, 'wall');
         wall.fixedToCamera = true;
         
+        //initialize lantern group
         lanterns = game.add.group();
         lanterns.enableBody = true;
         lanterns.physicsBodyType = Phaser.Physics.ARCADE;
         
-        //lanterns.body.immovable = true;
+        //loop 3 times to create evenly spaced lanterns
         var lantern;
         for (var i = 0; i < 3; i++){
             lantern = lanterns.create( 200 + i * 100, 550, 'lantern');
             lantern.body.immovable = true;
-            lantern.body.allowGravity = false;
+            lantern.body.allowGravity = false; 
             lantern.body.setSize(40,40);
             lantern.anchor.setTo(0.5,0.5);
             lantern.animations.add('lit', [1,2], 5, true);
         }
+        //add one more latern above the rest
         lantern = lanterns.create( 300, 450, 'lantern');
         lantern.body.immovable = true;
         lantern.body.allowGravity = false;
@@ -82,11 +89,12 @@ window.onload = function() {
         lantern.anchor.setTo(0.5,0.5);
         lantern.animations.add('lit', [1,2], 5, true);
         
-        
+        //initialize the player
         player = game.add.sprite(100, 560, 'player');
         game.physics.enable(player, Phaser.Physics.ARCADE);
         player.body.collideWorldBounds = true;
         player.body.setSize(30, 40);
+        //player animations
         player.animations.add('run-normal-right', [1,2,3], 10, true);
         player.animations.add('run-normal-left', [8,7,6], 10, true);
         player.animations.add('run-hot-right', [11,12,13], 10, true);
@@ -94,6 +102,7 @@ window.onload = function() {
         player.animations.add('run-burning-right', [21,22,23], 10, true);
         player.animations.add('run-burning-left', [28,27,26], 10, true);
         
+        //initialize fireball
         fireball = game.add.sprite( 20, 560, 'fireball' );
         fireball.anchor.setTo( 0.5, 0.5 );
         fireball.animations.add('standard', [0, 1, 2, 1], 5, true);
@@ -102,34 +111,29 @@ window.onload = function() {
         fireball.body.allowGravity = false;
         fireball.body.setSize(20,20);
 
-        
+        //for when scrolling is added
         game.camera.follow(player);
         
+        //initalize gravity
         game.physics.arcade.gravity.y = 400;
         
+        //initialize inputs
         cursors = game.input.keyboard.createCursorKeys();
         jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.UP);
         
-    
-        // Make it bounce off of the world bounds.
-        //fireball.body.collideWorldBounds = true;
-        
-    
     }
     
     function update() {
-        //game.physics.arcade.collide(player, layer);
         
+        //stop the player
         player.body.velocity.x = 0;
     
-        //control movement
-        if (cursors.left.isDown)
-        {
-            move = true;
+        //check inputs to move the player and handle animations
+        if (cursors.left.isDown){
+            move = true; //for use in moving the fireball only aftet player has moved
             player.body.velocity.x = -150;
-            
-            if (facing != 'left' && player.body.onFloor())
-            {
+            if (facing != 'left' && player.body.onFloor()){
+                //3 different sets of the same animations with different color player
                 if (health == 3){
                     player.animations.play('run-normal-left');
                 }
@@ -141,15 +145,11 @@ window.onload = function() {
                 }
                 facing = 'left';
             }
-
         }
-        else if (cursors.right.isDown)
-        {
+        else if (cursors.right.isDown){
             move = true;
-            player.body.velocity.x = 150;
-            
-            if (facing != 'right' && player.body.onFloor())
-            {
+            player.body.velocity.x = 150;  
+            if (facing != 'right' && player.body.onFloor()){
                 if (health == 3){
                     player.animations.play('run-normal-right');
                 }
@@ -163,14 +163,12 @@ window.onload = function() {
             }
 
         }
-        else
-        {
-            if (facing != 'idle')
-            {
+        else{
+            //check if standing still instead of moving
+            if (facing != 'idle'){
                 player.animations.stop();
-
-                if (facing == 'right')
-                {
+                //decide in which direction to stand still
+                if (facing == 'right'){
                     if (health == 3){
                         player.frame = 0;
                     }
@@ -181,8 +179,7 @@ window.onload = function() {
                         player.frame = 20;
                     }
                 }
-                else
-                {
+                else{
                     if (health == 3){
                         player.frame = 9;
                     }
@@ -193,12 +190,11 @@ window.onload = function() {
                         player.frame = 29;
                     }
                 }
-
                 facing = 'idle';
             }
         }
 
-        //control jump
+        //jump when on the ground
         if (jumpButton.isDown && player.body.onFloor() && game.time.now > jumpTimer)
         {
             player.animations.stop();
@@ -231,18 +227,15 @@ window.onload = function() {
             jumpTimer = game.time.now + 750;
         }
         
-        //move fireball
+        //move fireball towards player
         if (move){
             fireball.rotation = game.physics.arcade.accelerateToObject(fireball, player, 170, 170, 80);
-            //game.physics.arcade.moveToObject(fireball, player, 100);
         }
         
-        //fireball.rotation = game.physics.arcade.accelerateToPointer( fireball, player, 500, 500, 500 );
-        
-        //game.physics.arcade.collide(fireball, lanterns, fireHitLantern, null, this);
-        
+        //could have used timer, but didn't
         cooldown -= 1;
         
+        //check if fireball has hit the player if so, damamge and bounce player
         if (game.physics.arcade.intersects(player.body, fireball.body) && cooldown <= 0){
             hurtSound.play();
             health -= 1;
@@ -262,9 +255,10 @@ window.onload = function() {
         var check = true;
         for (var i = 0; i < lanterns.length; i++){
             lantern = lanterns.getChildAt(i);
+            //if still the first frame then it hasn't been lit
             if (lantern.frame == 0){
                 check = false;
-                //game.physics.arcade.collide(fireball, lantern, fireHitLantern, null, this);
+                //light this latern if fireball colides with it
                 if (game.physics.arcade.intersects(fireball.body, lantern.body)){
                     lightSound.play();
                     lantern.frame = 1;
@@ -272,7 +266,7 @@ window.onload = function() {
                 }
             } 
         }
-        //check if all lanterns lit
+        //check if all lanterns lit and then create door
         if (check && !doorOpen){
             doorSound.play();
             door = game.add.sprite(700, 520, 'door');
@@ -282,26 +276,20 @@ window.onload = function() {
             doorOpen = true;
         }
         
-        //check if player leaves through the door.
+        //check if player leaves through the door end game
         if (door != null){
-            //game.physics.arcade.collide(player, door, playerExit, null, this);
             if (game.physics.arcade.intersects(player.body, door.body)){
                 playerExit();
             }
         }
         
+        //end game if player health gone
         if (health <= 0){
             gameOver();
         }
     }
-    
-    function fireHitLantern(_fireball, _lantern){
-        //litLanterns.create(_lantern.x, _lantern.y, 'lit lantern');
-        if (_lantern.frame == 0){
-            _lantern.frame = 1;
-        }
-    }
-    
+
+    //function to end the level. currently kills player, because 
     function playerExit(){
         move = false;
         fireball.body.velocity.x = 0;
@@ -312,6 +300,7 @@ window.onload = function() {
         text.anchor.setTo( 0.5, 0.0 );
     }
     
+    //function that occurs on player death. 
     function gameOver(){
         move = false;
         fireball.body.velocity.x = 0;
