@@ -13,10 +13,10 @@ BasicGame.MainMenu.prototype = {
 		//	Here all we're doing is playing some music and adding a picture and button
 		//	Naturally I expect you to do something significantly better :)
 
-		this.music = this.add.audio('music');
-        this.music.loop = true;
-		this.music.play();
-        this.music.onLoop.add(this.playLevelMusic, this);
+//		this.music = this.add.audio('music');
+//        this.music.loop = true;
+//		this.music.play();
+//        this.music.onLoop.add(this.playLevelMusic, this);
 
 		this.add.sprite(0, 0, 'bg');
         this.add.tileSprite(0, 400, 800, 200, 'wall');

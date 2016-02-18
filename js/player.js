@@ -1,7 +1,7 @@
 BasicGame.Player = function(game) {
     
     this.game = game;
-    this.health = 3;
+    this.health;
     this.sprite = null;
     this.facing;
     this.jumpButton;
@@ -10,6 +10,7 @@ BasicGame.Player = function(game) {
     this.jumpTimer;
     this.hurtSound;
     this.jumpSound;
+    this.damageTimer;
     
 }
 
@@ -40,8 +41,15 @@ BasicGame.Player.prototype = {
         
         this.hasMoved = false;
         this.jumpTimer = 0;
-        
+        this.damageTimer = 0;
+        this.health = 3;
     },
+    
+//    remove: function() {
+//        this.sprite.destroy();
+//        this.sprite = null;
+//        
+//    },
     
     update: function() {
         this.sprite.body.velocity.x = 0;
@@ -79,11 +87,10 @@ BasicGame.Player.prototype = {
                 }
                 this.facing = 'right';
             }
-
         }
         else{
             //check if standing still instead of moving
-            if (this.facing != 'idle'){
+            if (this.facing != 'idle' && this.sprite.body.onFloor()){
                 this.sprite.animations.stop();
                 //decide in which direction to stand still
                 if (this.facing == 'right'){
@@ -143,6 +150,21 @@ BasicGame.Player.prototype = {
             }
             this.sprite.body.velocity.y = -250;
             this.jumpTimer = this.game.time.now + 750;
+        }
+        
+    },
+    
+    damage: function() {
+        if (this.sprite.alive){
+            BasicGame.player.hurtSound.play();
+            BasicGame.player.health -= 1;
+            this.damageTimer = this.game.time.now + 750;
+            if (BasicGame.player.health == 2){
+                BasicGame.player.sprite.frame = 15;
+            }
+            else {
+                BasicGame.player.sprite.frame = 25
+            }
         }
         
     }

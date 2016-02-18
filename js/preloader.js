@@ -46,11 +46,21 @@ BasicGame.Preloader.prototype = {
 
 	create: function () {
         BasicGame.player = new BasicGame.Player(this.game);
+        BasicGame.fireball = new BasicGame.Fireball(this.game);
+        
+        this.music = this.add.audio('music');
+        this.music.loop = true;
+		this.music.play();
+        this.music.onLoop.add(this.playLevelMusic, this);
 
 		//	Once the load has finished we disable the crop because we're going to sit in the update loop for a short while as the music decodes
 		//this.preloadBar.cropEnabled = false;
 
 	},
+    
+    playLevelMusic: function(){
+        this.music.play();  
+    },
 
 	update: function () {
 

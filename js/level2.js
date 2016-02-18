@@ -1,4 +1,4 @@
-BasicGame.Level1 = function (game) {
+BasicGame.Level2 = function (game) {
 
     //  When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
 
@@ -37,7 +37,7 @@ BasicGame.Level1 = function (game) {
     var lanterns;
     var door;
     var health;
-    var doorOpen = false;
+    var doorOpen;
     var cooldown = 0;
     var hurtSound;
     var jumpSound;
@@ -46,13 +46,14 @@ BasicGame.Level1 = function (game) {
     var music;
     
 
-BasicGame.Level1.prototype = {
+BasicGame.Level2.prototype = {
 
     create: function () {
         
         //initialize sound
         lightSound = this.add.audio('light');
         doorSound = this.add.audio('open');
+        doorOpen = false;
 
         
         //initialize background (and wall)
@@ -68,8 +69,8 @@ BasicGame.Level1.prototype = {
         
         //loop 3 times to create evenly spaced lanterns
         var lantern;
-        for (var i = 0; i < 3; i++){
-            lantern = lanterns.create( 200 + i * 100, 550, 'lantern');
+        for (var i = 0; i < 2; i++){
+            lantern = lanterns.create( 250 + i * 300, 450, 'lantern');
             lantern.body.immovable = true;
             lantern.body.allowGravity = false; 
             lantern.body.setSize(40,40);
@@ -77,12 +78,12 @@ BasicGame.Level1.prototype = {
             lantern.animations.add('lit', [1,2], 5, true);
         }
         //add one more latern above the rest
-        lantern = lanterns.create( 300, 450, 'lantern');
-        lantern.body.immovable = true;
-        lantern.body.allowGravity = false;
-        lantern.body.setSize(40,40);
-        lantern.anchor.setTo(0.5,0.5);
-        lantern.animations.add('lit', [1,2], 5, true);
+//        lantern = lanterns.create( 300, 450, 'lantern');
+//        lantern.body.immovable = true;
+//        lantern.body.allowGravity = false;
+//        lantern.body.setSize(40,40);
+//        lantern.anchor.setTo(0.5,0.5);
+//        lantern.animations.add('lit', [1,2], 5, true);
         
         //initialize player
         BasicGame.player.add(100,560);
@@ -121,7 +122,7 @@ BasicGame.Level1.prototype = {
         //check if all lanterns lit and then create door
         if (check && !doorOpen){
             doorSound.play();
-            door = this.add.sprite(700, 520, 'door');
+            door = this.add.sprite(380, 325, 'door');
             this.physics.enable(door, Phaser.Physics.ARCADE);
             door.body.immovable = true;
             door.body.allowGravity = false;
@@ -137,7 +138,7 @@ BasicGame.Level1.prototype = {
             }
             if (this.physics.arcade.intersects(BasicGame.fireball.sprite.body, door.body)){
                 BasicGame.fireball.sprite.kill();
-                this.state.start('Level2');
+                
             }
         }
         
